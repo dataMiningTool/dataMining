@@ -16,7 +16,7 @@ public class SamplePredictor {
 
     public SamplePredictor() {
         this.startIndex = XMLParser.getStartIndex();
-        this.offset = XMLParser.getSlides() - 1;
+        this.offset = XMLParser.getSlides();
         this.positiveResultThreshold = XMLParser.getPositiveResultThreshold();
         this.sampleGenerator = new SampleGenerator();
         this.neuralNetworkPredictor = new NeuralNetworkPredictor();       
@@ -29,7 +29,7 @@ public class SamplePredictor {
         ArrayList<Boolean> predictedResult = new ArrayList<>();
         
         for(int i = this.startIndex; i <= lastIndex - this.offset; i++){
-            ArrayList<String> subPhotos = (ArrayList<String>) photos.subList(i, i + this.offset);
+            ArrayList<String> subPhotos = new ArrayList<>(photos.subList(i, i + this.offset));
      
             this.sampleGenerator.setPhotos(subPhotos);
             Instances instances = this.sampleGenerator.generateSample();
@@ -47,7 +47,6 @@ public class SamplePredictor {
                 positiveResult++;
             }
         }
-        
         return positiveResult > positiveResultThreshold;
     }
     

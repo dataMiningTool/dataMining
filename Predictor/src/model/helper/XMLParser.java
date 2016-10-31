@@ -18,11 +18,11 @@ public class XMLParser {
     private static final int DEFAUTL_SLIDES = 4;
     private static final int DEFAUTL_POSITIVE_RESULT = 2;
     private static final float DEFAUTL_THRESHOLD = (float) 0.02;
-    private static final String SLIDES_TAG = "sildes";
+    private static final String SLIDES_TAG = "slides";
     private static final String START_INDEX_TAG = "start-index";
     private static final String RATE_THRESHOLD_TAG = "rate-threshold";
     private static final String POSITIVE_RESULT_THRESHOLD_TAG = "positive-result-threshold";
-    private static final String XML_FILE_PATH = "/resources/neuron network/config.xml";
+    private static final String XML_FILE_PATH = "\\resources\\neuronnetwork\\config.xml";
     
     private static Document readXMLDocument(){
         try {
@@ -34,6 +34,7 @@ public class XMLParser {
             
             Document doc = dbBuilder.parse(xmlFile);
             doc.getDocumentElement().normalize();
+            
             
             return doc;
         } catch (ParserConfigurationException | SAXException | IOException ex) {

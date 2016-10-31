@@ -1,7 +1,9 @@
 package model.neuralnetwork;
 
 import java.io.File;
+import java.math.RoundingMode;
 import java.nio.file.Paths;
+import java.text.DecimalFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.helper.XMLParser;
@@ -11,7 +13,7 @@ import weka.core.SerializationHelper;
 
 public class NeuralNetworkPredictor {
     private MultilayerPerceptron neuronNetwork;
-    private static final String MODEL_PATH = "/resources/neuron network/mlp.model";
+    private static final String MODEL_PATH = "\\resources\\neuronnetwork\\mlp.model";
 
     public NeuralNetworkPredictor() {
         loadModel();
@@ -39,9 +41,14 @@ public class NeuralNetworkPredictor {
         }
         
         int[] nominalCounts = predicteddata.attributeStats(predicteddata.numAttributes() - 1).nominalCounts;
-        float rate = nominalCounts[1] / nominalCounts[0];
-                
-        float threshold = XMLParser.getRateThreshold();
+        DecimalFormat df = new DecimalFormat("#.####");
+        df.setRoundingMode(RoundingMode.HALF_UP);
+        
+        double rate = Double.parseDouble(df.format((double)nominalCounts[1] / (double)nominalCounts[0])); 
+        double threshold = Double.parseDouble(df.format(XMLParser.getRateThreshold()));
+        System.out.println(rate);
+        System.out.println(threshold);
+        
         
         return rate > threshold;
     }

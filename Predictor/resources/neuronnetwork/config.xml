@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<start-index>9</start-index>
+	<slides>4</slides>
+	<rate-threshold>0.02</rate-threshold>
+	<positive-result-threshold>2</positive-result-threshold>
+</config>

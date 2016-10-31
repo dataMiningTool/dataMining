@@ -61,7 +61,6 @@ public class Sample {
                 instance.setValue((Attribute)header.get(attributeIndex), this.sampleData.get(attributeIndex).get(instanceIndex));
             } 
             
-            instance.setValue((Attribute)header.get(lastIndex), NOT_PREDICTED_CHARACTER);
             instances.add(instance);
         }
         

@@ -8,7 +8,6 @@ import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
-/*Load image*/
 public class ImageUtils {
 
     private String filePath = "";
