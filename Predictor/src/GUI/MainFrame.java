@@ -1,6 +1,8 @@
 package GUI;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FilenameFilter;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -14,6 +16,7 @@ public class MainFrame extends javax.swing.JFrame {
     private File directory;
     private final ImageUtils imgProcObj;
     private final SamplePredictor predictor;
+    public static String a = ""; 
     
 
     public MainFrame() {
@@ -24,6 +27,9 @@ public class MainFrame extends javax.swing.JFrame {
         this.predictor = new SamplePredictor();
     }
 
+    
+    
+            
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -31,10 +37,11 @@ public class MainFrame extends javax.swing.JFrame {
         browseButton = new javax.swing.JButton();
         imageLabel = new javax.swing.JLabel();
         ImageNameList = new javax.swing.JScrollPane();
-        imageNameList = new javax.swing.JList<>();
+        imageNameList = new javax.swing.JList<String>();
         ImageContainer = new javax.swing.JScrollPane();
         imageContainer = new javax.swing.JLabel();
         predictButton = new javax.swing.JButton();
+        PredictAllButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Sampling tool");
@@ -67,6 +74,13 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
+        PredictAllButton.setText("PredictAll");
+        PredictAllButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                PredictAllButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -89,8 +103,10 @@ public class MainFrame extends javax.swing.JFrame {
                                     .addComponent(browseButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(292, 292, 292)
-                                .addComponent(predictButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 298, Short.MAX_VALUE)))
+                                .addComponent(predictButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(71, 71, 71)
+                                .addComponent(PredictAllButton, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 143, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -102,10 +118,12 @@ public class MainFrame extends javax.swing.JFrame {
                 .addComponent(imageLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(ImageNameList, javax.swing.GroupLayout.DEFAULT_SIZE, 519, Short.MAX_VALUE)
-                    .addComponent(ImageContainer, javax.swing.GroupLayout.DEFAULT_SIZE, 519, Short.MAX_VALUE))
-                .addGap(17, 17, 17)
-                .addComponent(predictButton, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(ImageNameList, javax.swing.GroupLayout.DEFAULT_SIZE, 518, Short.MAX_VALUE)
+                    .addComponent(ImageContainer, javax.swing.GroupLayout.DEFAULT_SIZE, 518, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(predictButton, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(PredictAllButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -113,7 +131,8 @@ public class MainFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
     private File getDirectory(){
         JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        //fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         
         if(fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION){
             return fileChooser.getSelectedFile(); 
@@ -129,7 +148,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
         // TODO add your handling code here:
-        File directory = getDirectory();
+        File directory = getDirectory(); 
         if(directory != null){
             this.directory= directory;
             File[] filesInDirectory = directory.listFiles();
@@ -163,6 +182,25 @@ public class MainFrame extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_imageNameListValueChanged
+
+    private void PredictAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PredictAllButtonActionPerformed
+        // TODO add your handling code here:
+       
+        File[] directories = this.directory.listFiles(new FileFilter(){
+            
+          public boolean accept(File file) {
+                return file.isDirectory();
+        }
+       });
+         
+         //this.predictor.isSick(directories);
+        for (int i = 0 ; i < directories.length; i++){           
+             boolean isSick = this.predictor.isSick(directories[i]);
+             System.out.println(isSick);
+       }
+            
+        
+    }//GEN-LAST:event_PredictAllButtonActionPerformed
     
     private void updateImage(){
         ImageIcon imageIcon = new ImageIcon(this.imgProcObj.loadImage());
@@ -193,18 +231,21 @@ public class MainFrame extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
+        
         /* Create and display the form */
+         
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new MainFrame().setVisible(true);
             }
         });
+        
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane ImageContainer;
     private javax.swing.JScrollPane ImageNameList;
+    private javax.swing.JButton PredictAllButton;
     private javax.swing.JButton browseButton;
     private javax.swing.JLabel imageContainer;
     private javax.swing.JLabel imageLabel;
