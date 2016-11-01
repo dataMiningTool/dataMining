@@ -12,6 +12,10 @@ public class ImageUtils {
 
     private String filePath = "";
 
+    public ImageUtils() {
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+    }
+
     public void setFilePath(String filePath) {
         this.filePath = filePath;
     }
@@ -37,8 +41,6 @@ public class ImageUtils {
     }
     
     public Mat loadMat() {
-        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-
         Mat mat = Imgcodecs.imread(this.filePath);
         Mat grayMat = new Mat(mat.height(), mat.width(), CvType.CV_8UC3);
         Imgproc.cvtColor(mat, grayMat, Imgproc.COLOR_RGB2GRAY);

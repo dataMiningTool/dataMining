@@ -6,13 +6,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import model.datastore.Sample;
 import model.util.ImageUtils;
+import model.util.mask.BaseMaskGenerator;
 import model.util.mask.SimpleMaskGenerator;
 import org.opencv.core.Mat;
 import weka.core.Instances;
 
 public class SampleGenerator {
     private final ImageUtils imgObj;
-    private final SimpleMaskGenerator simpleMaskGenerator;
+    private final BaseMaskGenerator simpleMaskGenerator;
     private Polygon mask;
     
     private ArrayList<String> photos;

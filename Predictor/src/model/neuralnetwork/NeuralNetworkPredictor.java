@@ -49,7 +49,6 @@ public class NeuralNetworkPredictor {
         System.out.println(rate);
         System.out.println(threshold);
         
-        
         return rate > threshold;
     }
 }

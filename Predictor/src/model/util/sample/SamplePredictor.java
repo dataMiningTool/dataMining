@@ -2,20 +2,19 @@ package model.util.sample;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import model.helper.StringHelper;
 import model.helper.XMLParser;
 import model.neuralnetwork.NeuralNetworkPredictor;
 import weka.core.Instances;
 
 public class SamplePredictor {
-    private final int startIndex;
     private final int offset;
     private final int positiveResultThreshold;
     private final SampleGenerator sampleGenerator;
     private final NeuralNetworkPredictor neuralNetworkPredictor;
 
     public SamplePredictor() {
-        this.startIndex = XMLParser.getStartIndex();
         this.offset = XMLParser.getSlides();
         this.positiveResultThreshold = XMLParser.getPositiveResultThreshold();
         this.sampleGenerator = new SampleGenerator();
@@ -27,10 +26,11 @@ public class SamplePredictor {
         int lastIndex = photos.size() - 1;
         
         ArrayList<Boolean> predictedResult = new ArrayList<>();
-        
-        for(int i = this.startIndex; i <= lastIndex - this.offset; i++){
+        int startIndex = photos.size() / 2 - 1;
+                
+        for(int i = startIndex; i <= lastIndex - this.offset; i++){
             ArrayList<String> subPhotos = new ArrayList<>(photos.subList(i, i + this.offset));
-     
+            
             this.sampleGenerator.setPhotos(subPhotos);
             Instances instances = this.sampleGenerator.generateSample();
             predictedResult.add(this.neuralNetworkPredictor.isSick(instances));
@@ -47,7 +47,7 @@ public class SamplePredictor {
                 positiveResult++;
             }
         }
-        return positiveResult > positiveResultThreshold;
+        return positiveResult >= positiveResultThreshold;
     }
     
     private ArrayList<String> getPhotos(File directory){
