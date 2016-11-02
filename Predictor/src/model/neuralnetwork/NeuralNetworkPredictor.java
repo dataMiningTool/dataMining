@@ -7,11 +7,12 @@ import java.text.DecimalFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.helper.XMLParser;
+import model.util.Predictor;
 import weka.classifiers.functions.MultilayerPerceptron;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
 
-public class NeuralNetworkPredictor {
+public class NeuralNetworkPredictor implements Predictor{
     private MultilayerPerceptron neuronNetwork;
     private static final String MODEL_PATH = "\\resources\\neuronnetwork\\mlp.model";
 
@@ -28,6 +29,7 @@ public class NeuralNetworkPredictor {
         }
     }
     
+    @Override
     public boolean isSick(Instances instances){
         Instances predicteddata = new Instances(instances);
         

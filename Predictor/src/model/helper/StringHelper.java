@@ -5,7 +5,9 @@ import java.io.File;
 public class StringHelper { 
     
     public static String getExtension(String fileName){
-        return fileName.substring(fileName.indexOf('.', fileName.lastIndexOf('/')) + 1);
+        String[] fileNameComponents = fileName.split("\\.");
+        int extensionIndex = fileNameComponents.length - 1;
+        return fileNameComponents[extensionIndex];
     }
     
     public static String getAbsolutePath(String directoryPath, String fileName){

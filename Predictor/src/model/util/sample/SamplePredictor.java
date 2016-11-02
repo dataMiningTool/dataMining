@@ -2,18 +2,18 @@ package model.util.sample;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.concurrent.Callable;
 import model.helper.StringHelper;
 import model.helper.XMLParser;
 import model.neuralnetwork.NeuralNetworkPredictor;
+import model.util.Predictor;
 import weka.core.Instances;
 
 public class SamplePredictor implements Callable{
     private final int offset;
     private final int positiveResultThreshold;
     private final SampleGenerator sampleGenerator;
-    private final NeuralNetworkPredictor neuralNetworkPredictor;
+    private final Predictor neuralNetworkPredictor;
     private File directory;
 
     public SamplePredictor() {
