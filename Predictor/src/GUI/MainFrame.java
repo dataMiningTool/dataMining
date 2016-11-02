@@ -1,12 +1,18 @@
 package GUI;
+import IO.IOOperators;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
+import java.io.UnsupportedEncodingException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import model.helper.StringHelper;
 import model.util.ImageUtils;
 import model.util.sample.SamplePredictor;
@@ -17,12 +23,13 @@ public class MainFrame extends javax.swing.JFrame {
     private final ImageUtils imgProcObj;
     private final SamplePredictor predictor;
     public static String a = ""; 
+    private IOOperators io;
     
 
     public MainFrame() {
         initComponents();
         setLocationRelativeTo(null);
-        
+        this.io = new IOOperators();
         this.imgProcObj = new ImageUtils();
         this.predictor = new SamplePredictor();
     }
@@ -140,7 +147,10 @@ public class MainFrame extends javax.swing.JFrame {
     
     private void predictButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_predictButtonActionPerformed
         boolean isSick = this.predictor.isSick(this.directory);
-        System.out.println(isSick);
+        if(isSick)
+        JOptionPane.showMessageDialog(null, "Benh nhan duoc chuan doan bi xuat huyet nao");
+       else
+        JOptionPane.showMessageDialog(null, "Benh nhan duoc chuan doan binh thuong");
     }//GEN-LAST:event_predictButtonActionPerformed
 
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
@@ -188,10 +198,25 @@ public class MainFrame extends javax.swing.JFrame {
         }
        });
          
-        for (File subDirectory : directories){
+        
+        try {
+            this.io.setPATH(StringHelper.getAbsolutePath(StringHelper.getDirectoryPath(this.directory), "result.txt"));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+       
+        
+          for (File subDirectory : directories){
              boolean isSick = this.predictor.isSick(subDirectory);
+             if (isSick)
+                this.io.WriteFile("Folder " + subDirectory.getName() + ": xuat huyet");
+             else
+                this.io.WriteFile("Folder " + subDirectory.getName() + ": binh thuong");
              System.out.println(isSick);
-       }
+        }  
+        this.io.close();
             
         
     }//GEN-LAST:event_PredictAllButtonActionPerformed
