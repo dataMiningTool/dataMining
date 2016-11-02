@@ -6,6 +6,10 @@ import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.UnsupportedEncodingException;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
@@ -16,6 +20,9 @@ import javax.swing.JOptionPane;
 import model.helper.StringHelper;
 import model.util.ImageUtils;
 import model.util.sample.SamplePredictor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class MainFrame extends javax.swing.JFrame {
     public static final String NO_FILE = "No file";
@@ -23,6 +30,7 @@ public class MainFrame extends javax.swing.JFrame {
     private final ImageUtils imgProcObj;
     private final SamplePredictor predictor;
     public static String a = ""; 
+    private static final int nProcess = 8;
     private IOOperators io;
     
 
@@ -41,11 +49,12 @@ public class MainFrame extends javax.swing.JFrame {
         browseButton = new javax.swing.JButton();
         imageLabel = new javax.swing.JLabel();
         ImageNameList = new javax.swing.JScrollPane();
-        imageNameList = new javax.swing.JList<>();
+        imageNameList = new javax.swing.JList<String>();
         ImageContainer = new javax.swing.JScrollPane();
         imageContainer = new javax.swing.JLabel();
         predictButton = new javax.swing.JButton();
         PredictAllButton = new javax.swing.JButton();
+        parallel = new javax.swing.JRadioButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Sampling tool");
@@ -85,6 +94,8 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
+        parallel.setText("Parallel Running");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -106,11 +117,13 @@ public class MainFrame extends javax.swing.JFrame {
                                         .addComponent(imageLabel))
                                     .addComponent(browseButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(292, 292, 292)
+                                .addGap(163, 163, 163)
                                 .addComponent(predictButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(71, 71, 71)
-                                .addComponent(PredictAllButton, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 143, Short.MAX_VALUE)))
+                                .addGap(134, 134, 134)
+                                .addComponent(PredictAllButton, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(52, 52, 52)
+                                .addComponent(parallel)))
+                        .addGap(0, 56, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -122,12 +135,13 @@ public class MainFrame extends javax.swing.JFrame {
                 .addComponent(imageLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(ImageNameList, javax.swing.GroupLayout.DEFAULT_SIZE, 518, Short.MAX_VALUE)
-                    .addComponent(ImageContainer, javax.swing.GroupLayout.DEFAULT_SIZE, 518, Short.MAX_VALUE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(ImageNameList, javax.swing.GroupLayout.DEFAULT_SIZE, 517, Short.MAX_VALUE)
+                    .addComponent(ImageContainer, javax.swing.GroupLayout.DEFAULT_SIZE, 517, Short.MAX_VALUE))
+                .addGap(19, 19, 19)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(PredictAllButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(predictButton, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(PredictAllButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(parallel))
                 .addContainerGap())
         );
 
@@ -198,7 +212,7 @@ public class MainFrame extends javax.swing.JFrame {
         }
        });
          
-        
+        /* Set pathfile */
         try {
             this.io.setPATH(StringHelper.getAbsolutePath(StringHelper.getDirectoryPath(this.directory), "result.txt"));
         } catch (FileNotFoundException ex) {
@@ -208,15 +222,41 @@ public class MainFrame extends javax.swing.JFrame {
         }
        
         
-          for (File subDirectory : directories){
+         // Chay tuan tu
+        if(!parallel.isSelected()){
+            System.out.println("chay tuan tu");
+             for (File subDirectory : directories){
              boolean isSick = this.predictor.isSick(subDirectory);
              if (isSick)
                 this.io.WriteFile("Folder " + subDirectory.getName() + ": xuat huyet");
              else
                 this.io.WriteFile("Folder " + subDirectory.getName() + ": binh thuong");
-             System.out.println(isSick);
-        }  
-        this.io.close();
+            } 
+        }
+        
+        else{ //Chay song song
+            System.out.println("chay song song");
+            ExecutorService executor = Executors.newFixedThreadPool(nProcess);
+            Set<Future<String>> set = new HashSet<Future<String>>();
+            for (File subDirectory : directories){
+                Callable<String> callable = new SamplePredictor(subDirectory);
+                Future<String> future = executor.submit(callable);
+                set.add(future);
+            }
+          
+            for (Future<String> future : set) {
+                try {
+                    this.io.WriteFile(future.get());
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (ExecutionException ex) {
+                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+           }
+        }
+       
+         /*Close file*/
+         this.io.close();
             
         
     }//GEN-LAST:event_PredictAllButtonActionPerformed
@@ -269,6 +309,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel imageContainer;
     private javax.swing.JLabel imageLabel;
     private javax.swing.JList<String> imageNameList;
+    private javax.swing.JRadioButton parallel;
     private javax.swing.JButton predictButton;
     // End of variables declaration//GEN-END:variables
 }

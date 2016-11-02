@@ -3,22 +3,32 @@ package model.util.sample;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.Callable;
 import model.helper.StringHelper;
 import model.helper.XMLParser;
 import model.neuralnetwork.NeuralNetworkPredictor;
 import weka.core.Instances;
 
-public class SamplePredictor {
+public class SamplePredictor implements Callable{
     private final int offset;
     private final int positiveResultThreshold;
     private final SampleGenerator sampleGenerator;
     private final NeuralNetworkPredictor neuralNetworkPredictor;
+    private File directory;
 
     public SamplePredictor() {
         this.offset = XMLParser.getSlides();
         this.positiveResultThreshold = XMLParser.getPositiveResultThreshold();
         this.sampleGenerator = new SampleGenerator();
         this.neuralNetworkPredictor = new NeuralNetworkPredictor();       
+    }
+    
+    public SamplePredictor(File directory) {
+        this.offset = XMLParser.getSlides();
+        this.positiveResultThreshold = XMLParser.getPositiveResultThreshold();
+        this.sampleGenerator = new SampleGenerator();
+        this.neuralNetworkPredictor = new NeuralNetworkPredictor(); 
+        this.directory = directory;
     }
     
     public boolean isSick(File directory){
@@ -64,5 +74,14 @@ public class SamplePredictor {
         }
         
         return null;
+    }
+
+    @Override
+    public Object call() throws Exception {
+        if (isSick(directory))
+            return "Folder " + directory.getName() + ": xuat huyet";
+        else
+            return "Folder " + directory.getName() + ": binh thuong";
+         
     }
 }
