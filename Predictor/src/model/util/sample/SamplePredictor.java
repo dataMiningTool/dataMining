@@ -15,6 +15,13 @@ public class SamplePredictor implements Callable{
     private final SampleGenerator sampleGenerator;
     private final Predictor neuralNetworkPredictor;
     private File directory;
+    
+    // This variable indicates if will get all files of "directory" for predict or not
+    private boolean isFullFolder;
+    
+    public void setIsFullFolder(boolean value){
+        this.isFullFolder = value;
+    }
 
     public SamplePredictor() {
         this.offset = XMLParser.getSlides();
@@ -36,9 +43,11 @@ public class SamplePredictor implements Callable{
         int lastIndex = photos.size() - 1;
         
         ArrayList<Boolean> predictedResult = new ArrayList<>();
-        int startIndex = photos.size() / 2 - 1;
+               
+        int startIndex = (this.isFullFolder) ? 0 : (photos.size() / 2 - 1);
                 
-        for(int i = startIndex; i <= lastIndex - this.offset; i++){
+        
+        for(int i = startIndex; i <= photos.size() - this.offset; i++){
             ArrayList<String> subPhotos = new ArrayList<>(photos.subList(i, i + this.offset));
             
             this.sampleGenerator.setPhotos(subPhotos);
