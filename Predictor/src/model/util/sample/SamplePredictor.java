@@ -19,8 +19,10 @@ public class SamplePredictor implements Callable{
     // This variable indicates if will get all files of "directory" for predict or not
     private boolean isFullFolder;
     
-    public void setIsFullFolder(boolean value){
+    public SamplePredictor setIsFullFolder(boolean value){
         this.isFullFolder = value;
+        System.out.println("Set isFullFolder:  " + this.isFullFolder);
+        return this;
     }
 
     public SamplePredictor() {
@@ -44,8 +46,11 @@ public class SamplePredictor implements Callable{
         
         ArrayList<Boolean> predictedResult = new ArrayList<>();
                
-        int startIndex = (this.isFullFolder) ? 0 : (photos.size() / 2 - 1);
-                
+          int startIndex = (this.isFullFolder) ? 0 : (photos.size() / 2 - 1);
+         
+         System.out.println("This is fullFolder: " + this.isFullFolder);
+        System.out.println("This is startindex: " + startIndex);
+         System.out.println("This is offset: " + offset);
         
         for(int i = startIndex; i <= photos.size() - this.offset; i++){
             ArrayList<String> subPhotos = new ArrayList<>(photos.subList(i, i + this.offset));

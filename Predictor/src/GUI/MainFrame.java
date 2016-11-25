@@ -216,7 +216,7 @@ public class MainFrame extends javax.swing.JFrame {
     private void PredictAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PredictAllButtonActionPerformed
         // TODO add your handling code here:
         this.predictor.setIsFullFolder(isFullFolderCheckBox.isSelected());
-         
+        System.out.println("check?: " + isFullFolderCheckBox.isSelected());
         File[] directories = this.directory.listFiles(new FileFilter(){
           public boolean accept(File file) {
                 return file.isDirectory();
@@ -250,7 +250,7 @@ public class MainFrame extends javax.swing.JFrame {
             ExecutorService executor = Executors.newFixedThreadPool(nProcess);
             Set<Future<String>> set = new HashSet<Future<String>>();
             for (File subDirectory : directories){
-                Callable<String> callable = new SamplePredictor(subDirectory);
+                Callable<String> callable = new SamplePredictor(subDirectory).setIsFullFolder(true);
                 Future<String> future = executor.submit(callable);
                 set.add(future);
             }
