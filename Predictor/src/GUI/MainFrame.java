@@ -1,16 +1,8 @@
 package GUI;
-import IO.IOOperators;
+import io.IOoperator;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
@@ -19,24 +11,25 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import model.helper.StringHelper;
 import model.util.ImageUtils;
-import model.util.sample.SamplePredictor;
+import model.util.Predictor;
+import model.util.neuralcluster.NCSamplePredictor;
 
 public class MainFrame extends javax.swing.JFrame {
     public static final String NO_FILE = "No file";
     private File directory;
     private final ImageUtils imgProcObj;
-    private final SamplePredictor predictor;
+    private final Predictor predictor;
     public static String a = ""; 
-    private static final int nProcess = 8;
-    private IOOperators io;
+    //private static final int NUM_OF_PROCESS = 8;
+    private final IOoperator io;
     
 
     public MainFrame() {
         initComponents();
         setLocationRelativeTo(null);
-        this.io = new IOOperators();
+        this.io = new IOoperator();
         this.imgProcObj = new ImageUtils();
-        this.predictor = new SamplePredictor();
+        this.predictor = new NCSamplePredictor();
     }
             
     @SuppressWarnings("unchecked")
@@ -165,20 +158,21 @@ public class MainFrame extends javax.swing.JFrame {
     
     private void predictButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_predictButtonActionPerformed
         // TODO add your handling code here:
-        
-        this.predictor.setIsFullFolder(isFullFolderCheckBox.isSelected());
-       
+        ((NCSamplePredictor)this.predictor).setIsFullFolder(isFullFolderCheckBox.isSelected());
         boolean isSick = this.predictor.isSick(this.directory);
         
-        if(isSick)
-        JOptionPane.showMessageDialog(null, "Benh nhan duoc chuan doan bi xuat huyet nao");
-       else
-        JOptionPane.showMessageDialog(null, "Benh nhan duoc chuan doan binh thuong");
+        if(isSick){
+            JOptionPane.showMessageDialog(null, "Benh nhan duoc chuan doan bi xuat huyet nao");
+        }else{
+            JOptionPane.showMessageDialog(null, "Benh nhan duoc chuan doan binh thuong");
+        }
+        
     }//GEN-LAST:event_predictButtonActionPerformed
 
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
         // TODO add your handling code here:
         File directory = getDirectory(); 
+        
         if(directory != null){
             this.directory = directory;
             File[] filesInDirectory = directory.listFiles();
@@ -215,57 +209,45 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void PredictAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PredictAllButtonActionPerformed
         // TODO add your handling code here:
-        this.predictor.setIsFullFolder(isFullFolderCheckBox.isSelected());
-        System.out.println("check?: " + isFullFolderCheckBox.isSelected());
-        File[] directories = this.directory.listFiles(new FileFilter(){
-          public boolean accept(File file) {
-                return file.isDirectory();
-        }
-       });
+        ((NCSamplePredictor)this.predictor).setIsFullFolder(isFullFolderCheckBox.isSelected());
+        File[] directories = this.directory.listFiles((File file) -> file.isDirectory());
          
         /* Set pathfile */
         try {
             this.io.setPATH(StringHelper.getAbsolutePath(StringHelper.getDirectoryPath(this.directory), "result.txt"));
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (UnsupportedEncodingException ex) {
+        } catch (FileNotFoundException | UnsupportedEncodingException ex) {
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
        
         
          // Chay tuan tu
         if(!parallel.isSelected()){
-            System.out.println("chay tuan tu");
-             for (File subDirectory : directories){
-             boolean isSick = this.predictor.isSick(subDirectory);
-             if (isSick)
-                this.io.WriteFile("Folder " + subDirectory.getName() + ": xuat huyet");
-             else
-                this.io.WriteFile("Folder " + subDirectory.getName() + ": binh thuong");
+            for (File subDirectory : directories){
+                boolean isSick = this.predictor.isSick(subDirectory);
+                if (isSick)
+                   this.io.WriteFile("Folder " + subDirectory.getName() + ": xuat huyet");
+                else
+                   this.io.WriteFile("Folder " + subDirectory.getName() + ": binh thuong");
             } 
         }
         
-        else{ //Chay song song
-            System.out.println("chay song song");
-            ExecutorService executor = Executors.newFixedThreadPool(nProcess);
-            Set<Future<String>> set = new HashSet<Future<String>>();
-            for (File subDirectory : directories){
-                Callable<String> callable = new SamplePredictor(subDirectory).setIsFullFolder(true);
-                Future<String> future = executor.submit(callable);
-                set.add(future);
-            }
-          
-            for (Future<String> future : set) {
-                try {
-                    this.io.WriteFile(future.get());
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (ExecutionException ex) {
-                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-                }
-           }
-        }
-       
+//        else{ //Chay song song
+//            ExecutorService executor = Executors.newFixedThreadPool(NUM_OF_PROCESS);
+//            Set<Future<String>> set = new HashSet<Future<String>>();
+//            for (File subDirectory : directories){
+//                Callable<String> callable = new NCSamplePredictor(subDirectory).setIsFullFolder(true);
+//                Future<String> future = executor.submit(callable);
+//                set.add(future);
+//            }
+//          
+//            for (Future<String> future : set) {
+//                try {
+//                    this.io.WriteFile(future.get());
+//                } catch (InterruptedException | ExecutionException ex) {
+//                    Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//           }
+//        }
          /*Close file*/
          this.io.close();
             
@@ -304,10 +286,8 @@ public class MainFrame extends javax.swing.JFrame {
         
         /* Create and display the form */
          
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new MainFrame().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new MainFrame().setVisible(true);
         });
         
     }

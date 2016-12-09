@@ -17,10 +17,12 @@ public class XMLParser {
     private static final int DEFAUTL_START_INDEX = 9;
     private static final int DEFAUTL_SLIDES = 4;
     private static final int DEFAUTL_POSITIVE_RESULT = 2;
-    private static final float DEFAUTL_THRESHOLD = (float) 0.02;
+    private static final float DEFAUTL_RATE_THRESHOLD = (float) 0.02;
+    private static final float DEFAUTL_CLUSTER_THRESHOLD = (float) 25;
     private static final String SLIDES_TAG = "slides";
     private static final String START_INDEX_TAG = "start-index";
     private static final String RATE_THRESHOLD_TAG = "rate-threshold";
+    private static final String CLUSTER_THRESHOLD_TAG = "cluster-threshold";
     private static final String POSITIVE_RESULT_THRESHOLD_TAG = "positive-result-threshold";
     private static final String XML_FILE_PATH = "\\resources\\neuronnetwork\\config.xml";
     
@@ -77,7 +79,19 @@ public class XMLParser {
             return Float.parseFloat(element.getTextContent());
         }
         
-        return DEFAUTL_THRESHOLD;
+        return DEFAUTL_RATE_THRESHOLD;
+    }
+    
+    public static float getClusterThreshold(){
+        Document doc = readXMLDocument();
+        Node node = doc.getElementsByTagName(CLUSTER_THRESHOLD_TAG).item(0);
+        
+        if(node.getNodeType() == Node.ELEMENT_NODE){
+            Element element = (Element) node;
+            return Float.parseFloat(element.getTextContent());
+        }
+        
+        return DEFAUTL_CLUSTER_THRESHOLD;
     }
     
     public static int getPositiveResultThreshold(){

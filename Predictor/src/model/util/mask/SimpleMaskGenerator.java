@@ -8,7 +8,7 @@ public class SimpleMaskGenerator extends BaseMaskGenerator{
     protected Mat createMask(){
         Mat mask = super.imgObj.loadMat();
         
-        Imgproc.medianBlur(mask, mask, 33);
+        Imgproc.medianBlur(mask, mask, 19);
         Imgproc.threshold(mask, mask, 145, 10, Imgproc.THRESH_TOZERO_INV);
         Imgproc.medianBlur(mask, mask, 47);
         Imgproc.threshold(mask, mask, 10, 145, Imgproc.THRESH_BINARY);
