@@ -2,7 +2,8 @@
 <config>
 	<start-index>1</start-index>
 	<slides>4</slides>
-	<rate-threshold>0.018</rate-threshold>
-	<cluster-threshold>30</cluster-threshold>
+	<rate-threshold>0.012</rate-threshold>
+	<cluster-up-threshold>80</cluster-up-threshold>
+	<cluster-bottom-threshold>10</cluster-bottom-threshold>
 	<positive-result-threshold>2</positive-result-threshold>
 </config>

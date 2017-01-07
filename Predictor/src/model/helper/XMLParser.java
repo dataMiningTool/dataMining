@@ -17,12 +17,14 @@ public class XMLParser {
     private static final int DEFAUTL_START_INDEX = 9;
     private static final int DEFAUTL_SLIDES = 4;
     private static final int DEFAUTL_POSITIVE_RESULT = 2;
-    private static final float DEFAUTL_RATE_THRESHOLD = (float) 0.02;
-    private static final float DEFAUTL_CLUSTER_THRESHOLD = (float) 25;
+    private static final float DEFAUTL_RATE_THRESHOLD = (float) 0.012;
+    private static final float DEFAUTL_CLUSTER_UP_THRESHOLD = (float) 80;
+    private static final float DEFAUTL_CLUSTER_BOTTOM_THRESHOLD = (float) 10;
     private static final String SLIDES_TAG = "slides";
     private static final String START_INDEX_TAG = "start-index";
     private static final String RATE_THRESHOLD_TAG = "rate-threshold";
-    private static final String CLUSTER_THRESHOLD_TAG = "cluster-threshold";
+    private static final String CLUSTER_UP_THRESHOLD_TAG = "cluster-up-threshold";
+    private static final String CLUSTER_BOTTOM_THRESHOLD_TAG = "cluster-bottom-threshold";
     private static final String POSITIVE_RESULT_THRESHOLD_TAG = "positive-result-threshold";
     private static final String XML_FILE_PATH = "\\resources\\neuronnetwork\\config.xml";
     
@@ -82,16 +84,28 @@ public class XMLParser {
         return DEFAUTL_RATE_THRESHOLD;
     }
     
-    public static float getClusterThreshold(){
+    public static float getClusterUpThreshold(){
         Document doc = readXMLDocument();
-        Node node = doc.getElementsByTagName(CLUSTER_THRESHOLD_TAG).item(0);
+        Node node = doc.getElementsByTagName(CLUSTER_UP_THRESHOLD_TAG).item(0);
         
         if(node.getNodeType() == Node.ELEMENT_NODE){
             Element element = (Element) node;
             return Float.parseFloat(element.getTextContent());
         }
         
-        return DEFAUTL_CLUSTER_THRESHOLD;
+        return DEFAUTL_CLUSTER_UP_THRESHOLD;
+    }
+    
+    public static float getClusterBottomThreshold(){
+        Document doc = readXMLDocument();
+        Node node = doc.getElementsByTagName(CLUSTER_BOTTOM_THRESHOLD_TAG).item(0);
+        
+        if(node.getNodeType() == Node.ELEMENT_NODE){
+            Element element = (Element) node;
+            return Float.parseFloat(element.getTextContent());
+        }
+        
+        return DEFAUTL_CLUSTER_BOTTOM_THRESHOLD;
     }
     
     public static int getPositiveResultThreshold(){

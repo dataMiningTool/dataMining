@@ -3,9 +3,6 @@ package model.util.neuralcluster;
 import constant.Constant;
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.Arrays;
-import model.classifier.DBscanClassifier;
-import model.datastore.CoordinateSample;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -17,25 +14,28 @@ public class NCSampleTransformer {
     private NCSampleNoiseRemover noiseRemover;
 
     public NCSampleTransformer() {
-        normalCoordinates = new ArrayList<>();
-        abnormalCoordinates = new ArrayList<>();
+        this.normalCoordinates = new ArrayList<>();
+        this.abnormalCoordinates = new ArrayList<>();
     }
     
     public void categorizeData(){
         int index = 0;
+        this.normalCoordinates.clear();
+        this.abnormalCoordinates.clear();
         
         for(Instance instance : this.dataSet){
             String classLabel = instance.stringValue(instance.attribute(instance.numAttributes() - 1));
             
             if(classLabel.equalsIgnoreCase(Constant.NORMAL_CLASS)){
-                normalCoordinates.add(this.coordinates.get(index));
+                this.normalCoordinates.add(this.coordinates.get(index));
             }else{
-                abnormalCoordinates.add(this.coordinates.get(index));
-                noiseRemover = new NCSampleNoiseRemover(abnormalCoordinates);
+                this.abnormalCoordinates.add(this.coordinates.get(index));
             }
             
             index++;
         }
+        
+        this.noiseRemover = new NCSampleNoiseRemover(this.abnormalCoordinates);
     }
     
     public int getNumOfNormalPoints(){

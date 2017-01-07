@@ -218,16 +218,17 @@ public class MainFrame extends javax.swing.JFrame {
         } catch (FileNotFoundException | UnsupportedEncodingException ex) {
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
-       
         
          // Chay tuan tu
         if(!parallel.isSelected()){
             for (File subDirectory : directories){
                 boolean isSick = this.predictor.isSick(subDirectory);
-                if (isSick)
-                   this.io.WriteFile("Folder " + subDirectory.getName() + ": xuat huyet");
-                else
-                   this.io.WriteFile("Folder " + subDirectory.getName() + ": binh thuong");
+                
+                if (isSick){
+                    this.io.WriteFile(subDirectory.getName() + ": xuat huyet");
+                }else{
+                    this.io.WriteFile(subDirectory.getName() + ": binh thuong");
+                }
             } 
         }
         

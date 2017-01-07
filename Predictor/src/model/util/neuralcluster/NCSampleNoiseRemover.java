@@ -11,39 +11,41 @@ import weka.core.Instances;
 
 public class NCSampleNoiseRemover {
     private final ArrayList<Point> abnormalCoordinates;
-    private final float clusterThreshold;
+    private final float clusterUpThreshold;
+    private final float clusterBottomThreshold;
     private final NoiseDetecter detecter;
+    private static final int NUM_OF_ABNORMAL_THRESHOLD = 5;
 
     public NCSampleNoiseRemover(ArrayList<Point> abnormalCoordinates) {
         this.abnormalCoordinates = abnormalCoordinates;
-        this.clusterThreshold = XMLParser.getClusterThreshold();
+        this.clusterUpThreshold = XMLParser.getClusterUpThreshold();
+        this.clusterBottomThreshold = XMLParser.getClusterBottomThreshold();
         this.detecter = new NoiseDetecter();
-        
     }
     
     public ArrayList<Point> removeNoise(){
-        CoordinateSample coordinateSample = new CoordinateSample(this.abnormalCoordinates);
-        Instances coordinateInstances = coordinateSample.getInstances();
-        
-        DBscanClassifier classifier = new DBscanClassifier(coordinateInstances);
-        Instances predictedInstances = classifier.classify();
-        double numOfGroup = predictedInstances.numDistinctValues(predictedInstances.numAttributes() - 1);
-         
-        for(double i = 0; i < numOfGroup; i++){
-            ArrayList<Point> groupOfPoint = getPointsByGroup(predictedInstances, i);
-            this.detecter.setGroupOfPoints(groupOfPoint);
-            double meanDistance = this.detecter.getMeanDistance();
-            
-            //System.out.println(meanDistance);
-            
-            if(meanDistance >= this.clusterThreshold){
-                predictedInstances = removeNoiseGroup(predictedInstances, i);
-                this.abnormalCoordinates.removeAll(groupOfPoint);
+        if(this.abnormalCoordinates.size() >= NUM_OF_ABNORMAL_THRESHOLD ){
+            CoordinateSample coordinateSample = new CoordinateSample(this.abnormalCoordinates);
+            Instances coordinateInstances = coordinateSample.getInstances();
+
+            DBscanClassifier classifier = new DBscanClassifier(coordinateInstances);
+            Instances predictedInstances = classifier.classify();
+            double numOfGroup = predictedInstances.numDistinctValues(predictedInstances.numAttributes() - 1);
+
+            for(double i = 0; i < numOfGroup; i++){
+                ArrayList<Point> groupOfPoint = getPointsByGroup(predictedInstances, i);
+                this.detecter.setGroupOfPoints(groupOfPoint);
+                double meanDistance = this.detecter.getMeanDistance();
+
+                if(meanDistance >= this.clusterUpThreshold || meanDistance <= this.clusterBottomThreshold){
+                    predictedInstances = removeNoiseGroup(predictedInstances, i);
+                    this.abnormalCoordinates.removeAll(groupOfPoint);
+                }
             }
+        }else{
+            this.abnormalCoordinates.clear();
         }
-        
-        //System.out.println("/n");
-        
+     
         return this.abnormalCoordinates;
     }
     

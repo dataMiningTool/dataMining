@@ -24,11 +24,11 @@ public class NCSamplePredictor extends Predictor{
 
     public NCSamplePredictor() {
         this.df = new DecimalFormat("#.####");
-        df.setRoundingMode(RoundingMode.HALF_UP);
+        this.df.setRoundingMode(RoundingMode.HALF_UP);
         
         this.offset = XMLParser.getSlides();
         this.positiveResultThreshold = XMLParser.getPositiveResultThreshold();
-        this.rateThreshold = Double.parseDouble(df.format(XMLParser.getRateThreshold()));
+        this.rateThreshold = Double.parseDouble(this.df.format(XMLParser.getRateThreshold()));
         this.sampleProcessor = new NCSampleProcessor();
         this.neuralNetworkClassifier = new NeuralNetworkClassifier();
         this.sampleTransformer = new NCSampleTransformer();
@@ -73,7 +73,16 @@ public class NCSamplePredictor extends Predictor{
         double numOfAbnormalPoints = (double)this.sampleTransformer.getNumOfAbnormalPoints();
         double numOfNormalPoints = (double)this.sampleTransformer.getNumOfNormalPoints();
         
-        return Double.parseDouble(df.format(numOfAbnormalPoints / numOfNormalPoints));
+        System.out.println("normal: " + numOfNormalPoints);
+        System.out.println("abnormal: " + numOfAbnormalPoints);
+        
+        double rate = 0.0;
+                
+        if(numOfNormalPoints != 0){
+            rate = Double.parseDouble(this.df.format(numOfAbnormalPoints / numOfNormalPoints));
+        }
+        
+        return rate;
     }
     
     private boolean isGOEtoSlideThreshold(ArrayList<Boolean> predictedResult){
@@ -84,6 +93,6 @@ public class NCSamplePredictor extends Predictor{
                 positiveResult++;
             }
         }
-        return positiveResult >= positiveResultThreshold;
+        return positiveResult >= this.positiveResultThreshold;
     }
 }
