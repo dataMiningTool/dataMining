@@ -11,11 +11,32 @@ public class NCSampleTransformer {
     private ArrayList<Point> coordinates;
     private final ArrayList<Point> normalCoordinates;
     private final ArrayList<Point> abnormalCoordinates;
+    private  ArrayList<Point> realNormalCoordinates;
+    private  ArrayList<Point> realAbnormalCoordinates;
     private NCSampleNoiseRemover noiseRemover;
 
+    public ArrayList<Point> getNormalCoordinates() {
+        return normalCoordinates;
+    }
+
+    public ArrayList<Point> getRealNormalCoordinates() {
+        return realNormalCoordinates;
+    }
+
+    public ArrayList<Point> getRealAbnormalCoordinates() {
+        return realAbnormalCoordinates;
+    }
+
+    public ArrayList<Point> getAbnormalCoordinates() {
+        return abnormalCoordinates;
+    }
+
+   
     public NCSampleTransformer() {
         this.normalCoordinates = new ArrayList<>();
         this.abnormalCoordinates = new ArrayList<>();
+        this.realNormalCoordinates = new ArrayList<>();
+        this.realAbnormalCoordinates = new ArrayList<>();
     }
     
     public void categorizeData(){
@@ -36,7 +57,14 @@ public class NCSampleTransformer {
         }
         
         this.noiseRemover = new NCSampleNoiseRemover(this.abnormalCoordinates);
+        //update normal and abnormal coordinates
+        realAbnormalCoordinates = noiseRemover.removeNoise();
+        realNormalCoordinates = new ArrayList<>(this.normalCoordinates);
+        if(noiseRemover.getAbnormalCoordinates().size() > 0)
+            realNormalCoordinates.addAll(noiseRemover.getRemovedCoordinates());
+        
     }
+    
     
     public int getNumOfNormalPoints(){
         return this.normalCoordinates.size();

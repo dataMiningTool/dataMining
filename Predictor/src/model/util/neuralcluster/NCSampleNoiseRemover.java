@@ -11,6 +11,7 @@ import weka.core.Instances;
 
 public class NCSampleNoiseRemover {
     private final ArrayList<Point> abnormalCoordinates;
+    private ArrayList<Point> removedCoordinates;
     private final float clusterUpThreshold;
     private final float clusterBottomThreshold;
     private final NoiseDetecter detecter;
@@ -18,10 +19,21 @@ public class NCSampleNoiseRemover {
 
     public NCSampleNoiseRemover(ArrayList<Point> abnormalCoordinates) {
         this.abnormalCoordinates = abnormalCoordinates;
+        this.removedCoordinates = null;
         this.clusterUpThreshold = XMLParser.getClusterUpThreshold();
         this.clusterBottomThreshold = XMLParser.getClusterBottomThreshold();
         this.detecter = new NoiseDetecter();
     }
+
+    public ArrayList<Point> getAbnormalCoordinates() {
+        return abnormalCoordinates;
+    }
+
+    public ArrayList<Point> getRemovedCoordinates() {
+        return removedCoordinates;
+    }
+
+  
     
     public ArrayList<Point> removeNoise(){
         if(this.abnormalCoordinates.size() >= NUM_OF_ABNORMAL_THRESHOLD ){
@@ -34,6 +46,7 @@ public class NCSampleNoiseRemover {
 
             for(double i = 0; i < numOfGroup; i++){
                 ArrayList<Point> groupOfPoint = getPointsByGroup(predictedInstances, i);
+                removedCoordinates = new ArrayList<>(groupOfPoint);
                 this.detecter.setGroupOfPoints(groupOfPoint);
                 double meanDistance = this.detecter.getMeanDistance();
 

@@ -1,5 +1,6 @@
 package model.util.neuralcluster;
 
+import io.CSVFileWriter;
 import java.awt.Point;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -46,13 +47,13 @@ public class NCSamplePredictor extends Predictor{
         
         for(int i = startIndex; i <= photos.size() - this.offset; i++){
             ArrayList<String> subPhotos = new ArrayList<>(photos.subList(i, i + this.offset));
-            predictedResult.add(isGOEtoRateThreshold(subPhotos));
+            predictedResult.add(isGOEtoRateThreshold(subPhotos, i));
         }
         
         return isGOEtoSlideThreshold(predictedResult);
     }
     
-    private boolean isGOEtoRateThreshold(ArrayList<String> subPhotos){
+    private boolean isGOEtoRateThreshold(ArrayList<String> subPhotos, int indexSubPhotos){
         this.sampleProcessor.setPhotos(subPhotos);
             
         Instances instances = this.sampleProcessor.generateSample();
@@ -64,14 +65,20 @@ public class NCSamplePredictor extends Predictor{
         
         this.sampleTransformer.categorizeData();
         
+        ArrayList<Point> realNormalCoordinates = this.sampleTransformer.getRealNormalCoordinates();
+        ArrayList<Point> realAbnormalCoordinates = this.sampleTransformer.getRealAbnormalCoordinates();
+        
+        CSVFileWriter.writeToFile(realNormalCoordinates, "Normal", indexSubPhotos);
+        CSVFileWriter.writeToFile(realAbnormalCoordinates, "Abnormal", indexSubPhotos);
+        
         System.out.println("rate"+ String.valueOf(getRate()));
         
         return getRate() >= this.rateThreshold;
     }
     
     private double getRate(){
-        double numOfAbnormalPoints = (double)this.sampleTransformer.getNumOfAbnormalPoints();
-        double numOfNormalPoints = (double)this.sampleTransformer.getNumOfNormalPoints();
+        double numOfAbnormalPoints = (double)this.sampleTransformer.getRealAbnormalCoordinates().size();
+        double numOfNormalPoints = (double)this.sampleTransformer.getRealNormalCoordinates().size();
         
         System.out.println("normal: " + numOfNormalPoints);
         System.out.println("abnormal: " + numOfAbnormalPoints);
