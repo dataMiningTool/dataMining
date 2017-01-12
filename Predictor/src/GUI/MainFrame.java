@@ -2,6 +2,7 @@ package GUI;
 import io.IOoperator;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -217,6 +218,8 @@ public class MainFrame extends javax.swing.JFrame {
             this.io.setPATH(StringHelper.getAbsolutePath(StringHelper.getDirectoryPath(this.directory), "result.txt"));
         } catch (FileNotFoundException | UnsupportedEncodingException ex) {
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
         
          // Chay tuan tu
@@ -225,9 +228,9 @@ public class MainFrame extends javax.swing.JFrame {
                 boolean isSick = this.predictor.isSick(subDirectory);
                 
                 if (isSick){
-                    this.io.WriteFile(subDirectory.getName() + ": xuat huyet");
+                    this.io.WriteFile(subDirectory.getName() + ": xuat huyet" + "\n");
                 }else{
-                    this.io.WriteFile(subDirectory.getName() + ": binh thuong");
+                    this.io.WriteFile(subDirectory.getName() + ": binh thuong" + "\n");
                 }
             } 
         }
